@@ -13,7 +13,7 @@ CREATE DATABASE cw1
 	
 CREATE EXTENSION postgis; -- wyposażenie bazy w funkcje i rozwszezenia postgisa
 
--- WKT - sposob definicji danych w formie tekstowej 
+-- WKT - sposób definicji danych w formie tekstowej 
 -- ST_AsText(nazwa) - konwertuje WKB na WKT
 
 -- WKB - sposób definicji danych w formie binarnej
@@ -21,38 +21,38 @@ CREATE EXTENSION postgis; -- wyposażenie bazy w funkcje i rozwszezenia postgisa
 -- LINIE ST_GeomFromText('LINESTRING(x1 y2, x2 y2)', 0))
 -- PUNKTY ST_GeomFromText('POINT(X Y)',0)
 
-CREATE TABLE buildings (id INTEGER, name VARCHAR(50), height INTEGER, geom GEOMETRY );
+CREATE TABLE buildings (id INT PRIMARY KEY NOT NULL, name VARCHAR(50), height INTEGER, geom GEOMETRY );
 
 INSERT INTO buildings VALUES (1, 'BuildingA', 10, ST_GeomFromText('POLYGON((8 1.5, 10.5 1.5, 10.5 4, 8 4, 8 1.5))',0));
-INSERT INTO buildings VALUES (1, 'BuildingB', 10, ST_GeomFromText('POLYGON((4 5,6 5, 6 7, 4 7, 4 5))',0));
-INSERT INTO buildings VALUES (1, 'BuildingC', 10, ST_GeomFromText('POLYGON((3 6, 5 6, 5 8, 3 8, 3 6))',0));
-INSERT INTO buildings VALUES (1, 'BuildingD', 10, ST_GeomFromText('POLYGON((9 8, 10 8, 10 9, 9 9, 9 8))',0));
-INSERT INTO buildings VALUES (1, 'BuildingF', 10, ST_GeomFromText('POLYGON((1 1, 2 1, 2 2, 1 2, 1 1))',0));
+INSERT INTO buildings VALUES (2, 'BuildingB', 10, ST_GeomFromText('POLYGON((4 5,6 5, 6 7, 4 7, 4 5))',0));
+INSERT INTO buildings VALUES (3, 'BuildingC', 10, ST_GeomFromText('POLYGON((3 6, 5 6, 5 8, 3 8, 3 6))',0));
+INSERT INTO buildings VALUES (4, 'BuildingD', 10, ST_GeomFromText('POLYGON((9 8, 10 8, 10 9, 9 9, 9 8))',0));
+INSERT INTO buildings VALUES (5, 'BuildingF', 10, ST_GeomFromText('POLYGON((1 1, 2 1, 2 2, 1 2, 1 1))',0));
 
 SELECT *, ST_AsText(geom) AS WKT
 FROM buildings;
 
-CREATE TABLE roads (id INTEGER, name VARCHAR(50), geom GEOMETRY);
+CREATE TABLE roads (id INT PRIMARY KEY NOT NULL, name VARCHAR(50), geom GEOMETRY);
 
 INSERT INTO roads VALUES (1, 'RoadX', ST_GeomFromText('LINESTRING(0 4.5, 12 4.5)', 0));
-INSERT INTO roads VALUES (1, 'RoadY', ST_GeomFromText('LINESTRING(7.5 0, 7.5 10.5)', 0));
+INSERT INTO roads VALUES (2, 'RoadY', ST_GeomFromText('LINESTRING(7.5 0, 7.5 10.5)', 0));
 
 SELECT *, ST_AsText(geom) AS WKT
 FROM roads;
 
-CREATE TABLE points (id INTEGER, name VARCHAR(50), number INTEGER, geom GEOMETRY);
+CREATE TABLE points (id INT PRIMARY KEY NOT NULL, name VARCHAR(50), number INTEGER, geom GEOMETRY);
 
 INSERT INTO points VALUES (1, 'G', 10, ST_GeomFromText('POINT(1 3.5)',0));
-INSERT INTO points VALUES (1, 'H', 10, ST_GeomFromText('POINT(5.5 1.5)',0));
-INSERT INTO points VALUES (1, 'I', 10, ST_GeomFromText('POINT(9.5 6)',0));
-INSERT INTO points VALUES (1, 'J', 10, ST_GeomFromText('POINT(6.5 6)',0));
-INSERT INTO points VALUES (1, 'K', 10, ST_GeomFromText('POINT(6 9.5)',0));
+INSERT INTO points VALUES (2, 'H', 10, ST_GeomFromText('POINT(5.5 1.5)',0));
+INSERT INTO points VALUES (3, 'I', 10, ST_GeomFromText('POINT(9.5 6)',0));
+INSERT INTO points VALUES (4, 'J', 10, ST_GeomFromText('POINT(6.5 6)',0));
+INSERT INTO points VALUES (5, 'K', 10, ST_GeomFromText('POINT(6 9.5)',0));
 
 SELECT *, ST_AsText(geom) AS WKT
 FROM points;
 
 -- 1. Wyznacz całkowitą długość dróg w analizowanym mieście. 
-	--ST_LENGTH(geom)) - funkcja zwraca dlugosc linii, argumentem jest geometria
+	--ST_LENGTH(geom)) - funkcja zwraca dlugość linii, argumentem jest geometria
 	
 SELECT SUM(ST_LENGTH(geom)) AS total_length
 FROM roads;
@@ -74,7 +74,7 @@ ORDER BY ST_AREA(geom) DESC
 LIMIT 2;
 
 -- 5. Wyznacz najkrótszą odległość między budynkiem BuildingC a punktem G. 
-SELECT ST_Distance(buildings.geom, points.geom) AS shortest_distance -- ST_Length(ST_ShortestLine(buildings.geom, points.geom)) as a
+SELECT ST_Distance(buildings.geom, points.geom) AS shortest_distance -- ST_Length(ST_ShortestLine(buildings.geom, points.geom)) AS shortest_distance
 FROM buildings, points 
 WHERE buildings.name='BuildingC' AND points.name='G';
 
