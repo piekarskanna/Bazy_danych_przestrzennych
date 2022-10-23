@@ -60,10 +60,10 @@ LIMIT 1;
 
 INSERT INTO airportsNew 
 VALUES ('airportB',(SELECT ST_Centroid(ST_ShortestLine((SELECT geom 
-									  					FROM airportsNew 
-									  					WHERE name = 'ANNETTE ISLAND'), (SELECT geom 
-																						 FROM airportsNew 
-																						 WHERE name = 'ATKA')))), 200);
+							FROM airportsNew 
+							WHERE name = 'ANNETTE ISLAND'), (SELECT geom 
+											 FROM airportsNew 
+											 WHERE name = 'ATKA')))), 200);
 
 	
 -- 6) Wyznacz pole powierzchni obszaru, który oddalony jest mniej niż 1000 jednostek
