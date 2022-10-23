@@ -23,8 +23,8 @@ CREATE EXTENSION postgis;
 								   -- nowa tabela zostaje wypelniona wartosciami ze starej tabeli
 									
 CREATE TABLE tableB AS SELECT popp.* 
-					   FROM popp, majrivers 
-					   WHERE popp.f_codedesc = 'Building' AND  ST_Distance(majrivers.geom, popp.geom) < 1000;
+		       FROM popp, majrivers 
+		       WHERE popp.f_codedesc = 'Building' AND  ST_Distance(majrivers.geom, popp.geom) < 1000;
 SELECT COUNT(*) 
 FROM tableB;
 
