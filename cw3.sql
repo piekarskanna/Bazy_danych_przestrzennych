@@ -15,7 +15,7 @@ CREATE EXTENSION postgis;
 
 -- 1. Znajdź budynki, które zostały wybudowane lub wyremontowane na przestrzeni roku (zmiana
 --    pomiędzy 2018 a 2019).
---    ST_Equals(geom1,geom2) = T/F		- zwraca T, jeśli geometrie są „przestrzennie równe”.
+--    ST_Equals(geom1,geom2) = T/F	- zwraca T, jeśli geometrie są „przestrzennie równe”.
 
 SELECT *
 FROM T2018_KAR_POI_TABLE;
@@ -26,9 +26,8 @@ FROM T2019_KAR_BUILDINGS;
 CREATE TABLE Buildings AS (
 SELECT T2019.*
 FROM T2019_KAR_BUILDINGS AS T2019, 
-	 T2018_KAR_BUILDINGS AS T2018
-WHERE ST_Equals(T2019.geom, T2018.geom) = FALSE AND 
-	  T2019.polygon_id = T2018.polygon_id);
+     T2018_KAR_BUILDINGS AS T2018
+WHERE ST_Equals(T2019.geom, T2018.geom) = FALSE AND T2019.polygon_id = T2018.polygon_id);
 
 SELECT *
 FROM Buildings;
@@ -39,14 +38,14 @@ FROM Buildings;
 
 SELECT COUNT(*), T2019_P.type
 FROM T2018_KAR_POI_TABLE AS T2018_P,
-	 T2019_KAR_POI_TABLE AS T2019_P
+     T2019_KAR_POI_TABLE AS T2019_P
 WHERE ST_Contains((SELECT T2019_P.geom
-				   FROM T2018_KAR_POI_TABLE AS T2018_P,
-	 					T2019_KAR_POI_TABLE AS T2019_P
-				   WHERE ST_Equals(T2019_P.geom, T2019_P.geom) = FALSE AND T2018_P.poi_id = T2019_P.poi_id), ST_Buffer((SELECT T2019_B.geom
-				   																	   									FROM T2019_KAR_BUILDINGS AS T2019_B, 
-	 	   																							 						 T2018_KAR_BUILDINGS AS T2018_B
-	 																													WHERE ST_Equals(T2019_B.geom, T2018_B.geom) = FALSE AND T2019_B.polygon_id = T2018_B.polygon_id), 500))
+	           FROM T2018_KAR_POI_TABLE AS T2018_P,
+	 		T2019_KAR_POI_TABLE AS T2019_P
+		   WHERE ST_Equals(T2019_P.geom, T2019_P.geom) = FALSE AND T2018_P.poi_id = T2019_P.poi_id), ST_Buffer((SELECT T2019_B.geom
+				   											FROM T2019_KAR_BUILDINGS AS T2019_B, 
+	 	   													     T2018_KAR_BUILDINGS AS T2018_B
+	 														WHERE ST_Equals(T2019_B.geom, T2018_B.geom) = FALSE AND T2019_B.polygon_id = T2018_B.polygon_id), 500))
 GROUP BY T2019_P.type;
 	 
 -- 3. Utwórz nową tabelę o nazwie ‘streets_reprojected’, która zawierać będzie dane z tabeli
@@ -54,7 +53,7 @@ GROUP BY T2019_P.type;
 
 CREATE TABLE streets_reprojected AS (
 SELECT gid, link_id, st_name, ref_in_id, nref_in_id, func_class, speed_cat, fr_speed_l, to_speed_l, dir_travel, 
-	   ST_Transform(geom, 3068) as geom
+       ST_Transform(geom, 3068) as geom
 FROM T2019_KAR_STREETS);
 
 SELECT * 
@@ -74,7 +73,7 @@ CREATE TABLE input_points (id INT PRIMARY KEY,
 
 INSERT INTO input_points
 VALUES (1, ST_GeomFromText('POINT(8.36093 49.03174)', 4326)),
-	   (2, ST_GeomFromText('POINT(8.39876 49.00644)', 4326));
+       (2, ST_GeomFromText('POINT(8.39876 49.00644)', 4326));
 	
 SELECT *, ST_AsText(geom) 
 FROM input_points;
@@ -100,22 +99,21 @@ FROM input_points;
 SELECT * 
 FROM t2019_kar_street_node
 WHERE ST_Within(ST_Transform(t2019_kar_street_node.geom, 3068), 
-                ST_Buffer(ST_ShortestLine((SELECT geom 
-										   FROM input_points 
-										   WHERE id = 1),
-                                          (SELECT geom 
-										   FROM input_points 
-										   WHERE id = 2)), 200));
+      ST_Buffer(ST_ShortestLine((SELECT geom 
+				 FROM input_points 
+				 WHERE id = 1), (SELECT geom 
+						 FROM input_points 
+						 WHERE id = 2)), 200));
 
 -- 7. Policz jak wiele sklepów sportowych (‘Sporting Goods Store’ - tabela POIs) znajduje się
 --    w odległości 300 m od parków (LAND_USE_A).
 
 SELECT COUNT( DISTINCT(T2019_POI.geom))
-FROM t2019_kar_poi_table as T2019_POI, 
-	 t2019_kar_land_use_a as T2019_LAND
+FROM t2019_kar_poi_table AS T2019_POI, 
+     t2019_kar_land_use_a AS T2019_LAND
 WHERE T2019_POI.type = 'Sporting Goods Store' AND
-	  ST_DWithin(T2019_POI.geom, T2019_LAND.geom, 300) AND
-	  T2019_LAND.type = 'Park (City/County)';
+      ST_DWithin(T2019_POI.geom, T2019_LAND.geom, 300) AND
+      T2019_LAND.type = 'Park (City/County)';
 
 -- 8. Znajdź punkty przecięcia torów kolejowych (RAILWAYS) z ciekami (WATER_LINES). Zapisz
 --    znalezioną geometrię do osobnej tabeli o nazwie ‘T2019_KAR_BRIDGES’
@@ -125,7 +123,7 @@ WHERE T2019_POI.type = 'Sporting Goods Store' AND
 CREATE TABLE T2019_KAR_BRIDGES AS (
 SELECT DISTINCT(ST_Intersection(railways.geom, water_lines.geom))
 FROM T2019_KAR_RAILWAYS AS railways,
-	 T2019_KAR_WATER_LINES AS water_lines);
+     T2019_KAR_WATER_LINES AS water_lines);
 
 SELECT * 
 FROM T2019_KAR_BRIDGES;
