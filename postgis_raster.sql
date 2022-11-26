@@ -54,8 +54,8 @@ WHERE b.municipality ilike 'porto' and ST_Intersects(b.geom,a.rast);
 -- Przykład 1 - ST_AsRaster
 -- ST_AsRaster - rastrowanie tabeli z parafiami o takiej samej charakterystyce przestrzennej tj.: wielkość piksela, zakresy itp.
 CREATE TABLE schema_piekarska.porto_parishes AS WITH r AS (SELECT rast 
-		   											  FROM rasters.dem
-		                							  LIMIT 1 )
+		   					   FROM rasters.dem
+		               				   LIMIT 1 )
 SELECT ST_AsRaster(a.geom,r.rast,'8BUI',a.id,-32767) AS rast
 FROM vectors.porto_parishes AS a, r
 WHERE a.municipality ilike 'porto';
@@ -66,8 +66,8 @@ DROP TABLE schema_piekarska.porto_parishes; --> drop table porto_parishes first
 
 CREATE TABLE schema_piekarska.porto_parishes AS
 WITH r AS (SELECT rast 
-		   FROM rasters.dem
-		   LIMIT 1)
+	   FROM rasters.dem
+	   LIMIT 1)
 SELECT st_union(ST_AsRaster(a.geom,r.rast,'8BUI',a.id,-32767)) AS rast
 FROM vectors.porto_parishes AS a, r
 WHERE a.municipality ilike 'porto';
@@ -77,8 +77,8 @@ WHERE a.municipality ilike 'porto';
 DROP TABLE schema_piekarska.porto_parishes; --> drop table porto_parishes first
 CREATE TABLE schema_piekarska.porto_parishes AS
 WITH r AS (SELECT rast 
-		   FROM rasters.dem
-		   LIMIT 1 )
+	   FROM rasters.dem
+	   LIMIT 1 )
 SELECT st_tile(st_union(ST_AsRaster(a.geom,r.rast,'8BUI',a.id,-
 32767)),128,128,true,-32767) AS rast
 FROM vectors.porto_parishes AS a, r
@@ -143,13 +143,13 @@ FROM schema_piekarska.paranhos_dem AS a;
 
 -- Przykład 7 - ST_SummaryStats z lepszą kontrolą złożonego typu danych
 WITH t AS (SELECT st_summarystats(ST_Union(a.rast)) AS stats
-		   FROM schema_piekarska.paranhos_dem AS a)
+	   FROM schema_piekarska.paranhos_dem AS a)
 SELECT (stats).min,(stats).max,(stats).mean FROM t;
 
 -- Przykład 8 - ST_SummaryStats w połączeniu z GROUP BY
 -- GROUP BY - wyświetlenie statystyki dla każdego poligonu "parish"
 WITH t AS (SELECT b.parish AS parish, st_summarystats(ST_Union(ST_Clip(a.rast, b.geom,true))) AS stats
-FROM rasters.dem AS a, vectors.porto_parishes AS b
+           FROM rasters.dem AS a, vectors.porto_parishes AS b
 WHERE b.municipality ilike 'porto' and ST_Intersects(b.geom,a.rast)
 GROUP BY b.parish)
 SELECT parish,(stats).min,(stats).max,(stats).mean 
@@ -211,8 +211,8 @@ DROP TABLE schema_piekarska.tpi30_porto;
 -- Przykład 1 - Wyrażenie Algebry Map
 CREATE TABLE schema_piekarska.porto_ndvi AS
 WITH r AS (SELECT a.rid,ST_Clip(a.rast, b.geom,true) AS rast
-		   FROM rasters.landsat8 AS a, vectors.porto_parishes AS b
-		   WHERE b.municipality ilike 'porto' and ST_Intersects(b.geom,a.rast))
+	   FROM rasters.landsat8 AS a, vectors.porto_parishes AS b
+	   WHERE b.municipality ilike 'porto' and ST_Intersects(b.geom,a.rast))
 SELECT
 r.rid,ST_MapAlgebra(
 r.rast, 1,
